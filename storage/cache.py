@@ -7,15 +7,15 @@ import config
 DB_FILE = config.CACHE_DIR / "weread.db"
 
 
-def get_db():
+def _get_conn():
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
     return conn
 
 
 def init_db():
-    db = get_db()
-    db.executescript("""
+    conn = _get_conn()
+    conn.executescript("""
         CREATE TABLE IF NOT EXISTS books (
             id TEXT PRIMARY KEY,
             title TEXT,
@@ -37,5 +37,9 @@ def init_db():
             PRIMARY KEY (chapter_id, offset)
         );
     """)
-    db.commit()
-    return db
+    conn.commit()
+    conn.close()
+
+
+def get_db():
+    return _get_conn()
