@@ -51,3 +51,24 @@ class WeReadBook(Book):
         idx = min(page_num, len(chapters) - 1)
         content = self.get_content(chapters[idx].chapter_id)
         return content[:page_size], len(chapters)
+
+    def fetch_booklist(self) -> List[dict]:
+        """Fetch booklist from WeRead API."""
+        if not self.cookie:
+            raise ValueError("WeRead cookie not set. Run: fetch-fish config set-cookie <cookie>")
+        url = "https://weread.qq.com/web/bookList"
+        headers = {"Cookie": self.cookie}
+        resp = requests.get(url, headers=headers)
+        resp.raise_for_status()
+        return resp.json().get("books", [])
+
+    def cache_books(self):
+        """Cache booklist to database."""
+        books = self.fetch_booklist()
+        db = get_db()
+        for b in books:
+            db.execute(
+                "INSERT OR REPLACE INTO books (id, title, author) VALUES (?, ?, ?)",
+                (b["bookId"], b["title"], b["author"])
+            )
+        db.commit()
