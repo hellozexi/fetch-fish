@@ -45,7 +45,19 @@ def cmd_pdf_open(args):
     except FileNotFoundError:
         print(f"File not found: {args.path}")
         return
-    read_book(book.get_page, book.title, book.author)
+    read_book(
+        book.get_page,
+        book.title,
+        book.author,
+        book_id=book.book_id,
+        get_chapters=book.get_chapters
+    )
+
+
+def cmd_pdf_clear(args):
+    """Clear reading progress for a PDF."""
+    from reader import clear_progress
+    clear_progress(args.path)
 
 
 def cmd_set_cookie(args):
@@ -75,6 +87,9 @@ def main():
     p_pdf_open = pdf_sub.add_parser("open", help="Open PDF")
     p_pdf_open.add_argument("path")
     p_pdf_open.set_defaults(func=cmd_pdf_open)
+    p_pdf_clear = pdf_sub.add_parser("clear", help="Clear reading progress")
+    p_pdf_clear.add_argument("path")
+    p_pdf_clear.set_defaults(func=cmd_pdf_clear)
 
     # Config command
     p_config = sub.add_parser("config", help="Configuration")
