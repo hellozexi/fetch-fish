@@ -66,8 +66,20 @@ def read_book(
             page = saved_page
             print(f"[继续上次阅读: 第 {page + 1} 页]")
 
+    def show_page(book, page_num):
+        """Show a single page, skipping blank pages."""
+        content, total = get_page(page_num, 0)
+        if content.strip():
+            return content, total, page_num
+        # Skip blank pages
+        if page_num < total - 1:
+            return show_page(book, page_num + 1)
+        else:
+            return "", total, page_num
+
     while True:
-        content, total = get_page(page, page_size=0)  # page_size not used for PDF
+        content, total, actual_page = show_page(None, page)
+
         if not content:
             print("\n[已到末尾]")
             break
@@ -83,7 +95,7 @@ def read_book(
             print(line)
 
         print("-" * 50)
-        print(f"[第 {page + 1}/{total} 页] | n=下一页 p=上一页 g=跳转 c=目录 q=退出")
+        print(f"[第 {actual_page + 1}/{total} 页] | n=下一页 p=上一页 g=跳转 c=目录 q=退出")
         print("\n请按键操作...", end="", flush=True)
 
         cmd = read_char()
