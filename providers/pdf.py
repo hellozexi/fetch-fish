@@ -25,10 +25,11 @@ class PDFBook(Book):
         chapters = []
         for i, (level, title, page) in enumerate(toc):
             if level == 1:
+                # PDF TOC pages are 1-based, PyMuPDF is 0-based
                 chapters.append(Chapter(
                     index=len(chapters),
                     title=title or f"Page {page}",
-                    chapter_id=str(page)
+                    chapter_id=str(page - 1)
                 ))
         if not chapters:
             chapters.append(Chapter(index=0, title="Start", chapter_id="0"))
